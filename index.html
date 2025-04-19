@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>El Mundo Del Celular</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gradient-to-br from-purple-800 to-blue-900 min-h-screen text-white"
+  >
+    <div id="root" class="p-6"></div>
+
+    <script type="text/babel">
+      function App() {
+        const [carrito, setCarrito] = React.useState([]);
+        const [productos, setProductos] = React.useState([
+          {
+            id: 1,
+            name: "iPhone 13",
+            category: "Apple",
+            price: 900,
+            favorite: true,
+          },
+          {
+            id: 2,
+            name: "Samsung S21",
+            category: "Samsung",
+            price: 750,
+            favorite: false,
+          },
+          {
+            id: 3,
+            name: "Xiaomi Mi 11",
+            category: "Xiaomi",
+            price: 600,
+            favorite: false,
+          },
+        ]);
+
+        const agregarAlCarrito = (producto) => {
+          setCarrito([...carrito, producto]);
+        };
+
+        const quitarDelCarrito = (id) => {
+          setCarrito(carrito.filter((item) => item.id !== id));
+        };
+
+        const toggleFavorite = (id) => {
+          setProductos(
+            productos.map((p) =>
+              p.id === id ? { ...p, favorite: !p.favorite } : p
+            )
+          );
+        };
+
+        return (
+          <div>
+            <h1 className="text-3xl font-bold mb-6 text-center">
+              El Mundo Del Celular
+            </h1>
+            <Carrito carrito={carrito} onRemove={quitarDelCarrito} />
+            <ProductList
+              productos={productos}
+              onAdd={agregarAlCarrito}
+              onToggleFavorite={toggleFavorite}
+            />
+          </div>
+        );
+      }
+
+      function ProductList({ productos, onAdd, onToggleFavorite }) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+            {productos.map((producto) => (
+              <ProductCard
+                key={producto.id}
+                producto={producto}
+                onAdd={onAdd}
+                onToggleFavorite={onToggleFavorite}
+              />
+            ))}
+          </div>
+        );
+      }
+
+      function ProductCard({ producto, onAdd, onToggleFavorite }) {
+        return (
+          <div className="bg-white text-black border rounded-2xl p-4 shadow-xl">
+            <h2 className="text-xl font-semibold">{producto.name}</h2>
+            <p className="text-sm text-gray-600">
+              Categoría: {producto.category}
+            </p>
+            <p className="text-lg font-bold">${producto.price}</p>
+            <FavoriteIcon
+              favorite={producto.favorite}
+              onClick={() => onToggleFavorite(producto.id)}
+            />
+            <button
+              onClick={() => onAdd(producto)}
+              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
+            >
+              Agregar al carrito
+            </button>
+          </div>
+        );
+      }
+
+      function FavoriteIcon({ favorite, onClick }) {
+        return (
+          <button onClick={onClick} className="text-xl mt-2">
+            <span className={favorite ? "text-red-500" : "text-gray-400"}>
+              {favorite ? "❤️" : "🤍"}
+            </span>
+          </button>
+        );
+      }
+
+      function Carrito({ carrito, onRemove }) {
+        return (
+          <div className="bg-white text-black p-4 rounded-xl shadow-xl mb-6 max-w-xl mx-auto">
+            <h2 className="text-xl font-semibold mb-2">
+              🛒 Carrito ({carrito.length})
+            </h2>
+            {carrito.length === 0 ? (
+              <p className="text-gray-600">Tu carrito está vacío.</p>
+            ) : (
+              <ul>
+                {carrito.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex justify-between items-center mb-2"
+                  >
+                    <span>
+                      {item.name} - ${item.price}
+                    </span>
+                    <button
+                      onClick={() => onRemove(item.id)}
+                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                    >
+                      Quitar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
